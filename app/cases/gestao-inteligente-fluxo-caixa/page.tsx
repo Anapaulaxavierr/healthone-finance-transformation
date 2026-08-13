@@ -5,7 +5,7 @@ import { SectionHeading } from "@/components/section-heading";
 
 export const metadata: Metadata = {
   title: "Gestão Inteligente do Fluxo de Caixa | HealthOne",
-  description: "Como transformar um processo financeiro manual em um processo orientado por indicadores e automação.",
+  description: "Projeto de transformação financeira focado em previsibilidade, automação e indicadores executivos.",
 };
 
 const problems = [
@@ -44,12 +44,25 @@ export default function CashFlowCasePage() {
     <div className="min-h-screen bg-[#f5f7f7] text-[#102f35]">
       <Header />
       <main>
-        <section className="relative isolate overflow-hidden bg-[#0d3137] px-6 py-20 sm:py-28 lg:px-8 lg:py-32">
+        <section className="relative isolate overflow-hidden bg-[#0d3137] px-6 py-14 sm:py-16 lg:px-8 lg:py-16">
           <div aria-hidden="true" className="hero-grid absolute inset-0 -z-10 opacity-20" />
           <div className="mx-auto max-w-6xl">
-            <span className="inline-flex rounded-full border border-[#8de0c1]/40 bg-[#8de0c1]/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-[#8de0c1]">Case 01</span>
-            <h1 className="mt-7 max-w-4xl text-5xl font-semibold leading-[1.06] tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl">Gestão Inteligente do Fluxo de Caixa</h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-[#c8d8d8] sm:text-xl">Como transformar um processo financeiro manual em um processo orientado por indicadores e automação.</p>
+            <span className="inline-flex rounded-full border border-[#8de0c1]/40 bg-[#8de0c1]/10 px-4 py-2 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[#8de0c1]">Case 01 <span aria-hidden="true" className="mx-2 opacity-60">·</span> Finance Transformation</span>
+            <h1 className="mt-6 max-w-4xl text-4xl font-semibold leading-[1.06] tracking-[-0.04em] text-white sm:text-5xl lg:text-6xl">Gestão Inteligente do Fluxo de Caixa</h1>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-[#c8d8d8] sm:text-lg">Projeto de transformação financeira focado em previsibilidade, automação e indicadores executivos.</p>
+            <div className="mt-5 flex flex-wrap gap-2" aria-label="Destaques do Case">
+              {["Fluxo de Caixa", "Automação", "Dashboard Executivo"].map((highlight) => (
+                <span key={highlight} className="rounded-full border border-white/15 bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-[#d8e6e4]">{highlight}</span>
+              ))}
+            </div>
+            <div className="mt-6 border-t border-white/10 pt-5">
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#8de0c1]">Foco do projeto</p>
+              <ul className="mt-3 flex flex-wrap gap-x-7 gap-y-2 text-sm text-[#e6eeee]">
+                {["Maior previsibilidade financeira", "Redução de atividades manuais", "Apoio à decisão executiva"].map((impact) => (
+                  <li key={impact} className="flex items-center gap-2"><span aria-hidden="true" className="size-1.5 rounded-full bg-[#8de0c1]" />{impact}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
 
