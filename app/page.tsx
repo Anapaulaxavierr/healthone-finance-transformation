@@ -3,9 +3,9 @@ import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 
 const cases = [
-  "Gestão Inteligente do Fluxo de Caixa",
-  "Correção Monetária utilizando IPCA",
-  "Automação de Contas a Pagar",
+  { title: "Gestão Inteligente do Fluxo de Caixa", href: "/cases/gestao-inteligente-fluxo-caixa/" },
+  { title: "Correção Monetária utilizando IPCA" },
+  { title: "Automação de Contas a Pagar" },
 ];
 
 export default function Home() {
@@ -47,8 +47,8 @@ export default function Home() {
               </p>
             </div>
             <div className="mt-12 grid gap-5 md:grid-cols-3">
-              {cases.map((title, index) => (
-                <CaseCard key={title} title={title} number={String(index + 1).padStart(2, "0")} />
+              {cases.map(({ title, href }, index) => (
+                <CaseCard key={title} title={title} href={href} number={String(index + 1).padStart(2, "0")} />
               ))}
             </div>
           </div>
