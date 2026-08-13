@@ -1,82 +1,85 @@
-# SPEC 00 — Bootstrap do HealthOne Finance Transformation
+# SPEC 00 — Bootstrap do projeto
 
 ## Contexto
 
-O **HealthOne Finance Transformation** será desenvolvido como um projeto de portfólio sobre a aplicação de finanças, tecnologia, automação e inteligência artificial à transformação de processos financeiros.
+Você está iniciando um novo projeto chamado **HealthOne Finance Transformation**.
 
-O desenvolvimento seguirá a metodologia Spec-Driven Development (SDD), na qual cada etapa relevante possui uma especificação, escopo delimitado e critérios de aceite verificáveis.
+O objetivo deste repositório é servir como um portfólio profissional contendo estudos de caso (Cases) sobre transformação financeira, melhoria de processos, automação e indicadores.
+
+Este projeto NÃO é um sistema financeiro.
+
+Ele é um site institucional moderno que apresenta estudos de caso desenvolvidos em uma empresa fictícia chamada HealthOne.
+
+A identidade do projeto deve transmitir profissionalismo, simplicidade, organização e alto padrão visual.
+
+Slogan oficial:
+
+> Transformando dados financeiros em decisões estratégicas.
 
 ## Objetivo
 
-Inicializar o repositório Git local e criar a estrutura mínima necessária para que as próximas etapas evoluam de forma incremental e orientada por especificações.
+Criar a fundação do projeto.
 
-## Escopo
+Nenhuma funcionalidade de negócio deve ser implementada nesta etapa.
 
-- Inicializar o repositório Git com `main` como branch principal;
-- criar os diretórios `specs/`, `docs/` e `src/`;
-- adicionar um `.gitignore` adequado;
-- criar o README inicial do projeto;
-- adicionar a licença MIT;
-- registrar esta especificação;
-- validar a estrutura e criar o commit inicial.
+## Implementação
 
-## Requisitos
+Criar um projeto utilizando:
 
-### RF-00.01 — Inicializar Git
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- ESLint
 
-O diretório deve ser um repositório Git válido e utilizar `main` como branch principal.
+Preparar o projeto para futura publicação no GitHub Pages.
 
-### RF-00.02 — Criar estrutura inicial
+Criar a estrutura:
 
-Os diretórios `specs/`, `docs/` e `src/` devem existir. Diretórios ainda sem conteúdo devem possuir `.gitkeep` para serem preservados pelo Git.
+```text
+app/
+components/
+content/cases/
+public/images/
+public/icons/
+docs/
+```
 
-### RF-00.03 — Criar `.gitignore`
+Criar um Header simples contendo o logo textual “HealthOne Finance Transformation”.
 
-O arquivo deve ignorar, no mínimo, `.DS_Store`, arquivos de ambiente, dependências, artefatos de distribuição, cobertura e logs, sem excluir documentação ou arquivos necessários ao desenvolvimento futuro.
+Criar uma Home contendo uma Hero Section com:
 
-### RF-00.04 — Criar README inicial
+- título “HealthOne Finance Transformation”;
+- subtítulo “Transformando dados financeiros em decisões estratégicas.”;
+- botão “Conhecer Cases”.
 
-O README deve apresentar título, descrição, objetivo, tecnologias planejadas, uso de SDD, status atual e estrutura básica, sem declarar como prontas funcionalidades futuras.
+Logo abaixo, criar uma seção “Cases” com apenas três cards vazios:
 
-### RF-00.05 — Criar licença
+- Gestão Inteligente do Fluxo de Caixa;
+- Correção Monetária utilizando IPCA;
+- Automação de Contas a Pagar.
 
-O projeto deve possuir uma licença MIT no arquivo `LICENSE`.
+Criar um Footer simples, README inicial, licença MIT e `.gitignore`.
 
-### RF-00.06 — Documentar a SPEC 00
+## Fora do escopo
 
-Este arquivo deve registrar contexto, objetivo, escopo, requisitos, itens fora de escopo, critérios de aceite e resultado da implementação.
+Não implementar:
 
-## Requisitos não funcionais
-
-- **Simplicidade:** nenhuma ferramenta ou dependência desnecessária deve ser adicionada.
-- **Legibilidade:** a estrutura deve ser compreensível para quem acessa o repositório pela primeira vez.
-- **Idioma:** a documentação de portfólio deve ser prioritariamente escrita em português brasileiro.
-- **Portabilidade:** nenhum caminho absoluto ou referência específica à máquina local deve ser incluído.
-
-## Fora de escopo
-
-- Integrações com APIs ou chamadas HTTP;
-- importação ou processamento de dados financeiros;
-- cálculos, indicadores, projeções ou regras financeiras;
-- dashboards ou interfaces;
-- autenticação, testes de regras de negócio ou CI/CD;
-- configuração de gerenciadores de pacotes ou instalação de dependências;
-- criação ou publicação de repositório remoto;
-- implementação antecipada de especificações futuras.
+- Power Automate;
+- Dashboard;
+- Cases;
+- Banco de dados;
+- Integrações;
+- Backend.
 
 ## Critérios de aceite
 
-- [x] O diretório é um repositório Git válido;
-- [x] a branch principal é `main`;
-- [x] os diretórios `specs/`, `docs/` e `src/` existem;
-- [x] o `.gitignore` contém as regras mínimas requeridas;
-- [x] o `README.md` apresenta o estado atual do projeto;
-- [x] o `LICENSE` contém a licença MIT;
-- [x] esta especificação documenta a etapa;
-- [x] `git status` funciona sem erros;
-- [x] nenhuma funcionalidade financeira foi implementada;
-- [x] nenhuma dependência desnecessária foi instalada.
+- [x] Projeto executa sem erros;
+- [x] layout responsivo;
+- [x] estrutura criada;
+- [x] README criado;
+- [x] Home funcional;
+- [x] primeiro commit realizado.
 
-## Resultado da implementação
+## Resultado
 
-Em 13 de agosto de 2026, o repositório Git local foi inicializado na branch `main` e recebeu a estrutura mínima definida nesta especificação. Foram adicionados somente documentação, licença, regras de versionamento e marcadores para diretórios vazios. Nenhuma regra de negócio, integração, dependência ou funcionalidade foi incluída.
+Em 13 de agosto de 2026, a fundação do projeto foi criada com a stack e a estrutura definidas nesta especificação. A Home institucional contém Header, Hero, acesso à seção de Cases, três cards de apresentação e Footer. O projeto foi preparado para exportação estática, sem implementar regras de negócio ou conteúdos de Cases.

@@ -1,35 +1,55 @@
 # HealthOne Finance Transformation
 
-Projeto de portfólio dedicado à transformação financeira da HealthOne, combinando finanças, tecnologia, automação e inteligência artificial para estruturar soluções incrementais para desafios reais de gestão.
+Site institucional e portfólio profissional de estudos de caso sobre transformação financeira, melhoria de processos, automação e indicadores em uma empresa fictícia chamada HealthOne.
 
-## Objetivo
+> Transformando dados financeiros em decisões estratégicas.
 
-Documentar e desenvolver, de forma orientada por especificações, uma iniciativa de transformação dos processos financeiros da HealthOne. Cada capacidade será delimitada e validada antes de sua implementação.
+## Sobre o projeto
 
-## Tecnologias planejadas
+Este repositório não representa um sistema financeiro. Ele apresenta, de forma organizada e visual, Cases que serão desenvolvidos progressivamente por meio de **Spec-Driven Development (SDD)**.
 
-As tecnologias serão definidas nas próximas especificações, conforme as necessidades do projeto. Não há dependências ou aplicações funcionais nesta etapa inicial.
+Nesta primeira etapa, o projeto contém a fundação visual e técnica da página inicial. Os Cases exibidos são apenas placeholders e ainda não possuem conteúdo ou funcionalidades.
 
-## Metodologia
+## Tecnologias
 
-O projeto utiliza **Spec-Driven Development (SDD)**. Cada etapa relevante possui uma especificação com contexto, escopo, requisitos e critérios de aceite verificáveis.
+- Next.js com App Router
+- TypeScript
+- Tailwind CSS
+- ESLint
 
-## Status
+## Executar localmente
 
-**Bootstrap concluído.** O repositório contém somente a estrutura inicial, documentação e arquivos de governança. Funcionalidades financeiras ainda não foram implementadas.
+```bash
+npm install
+npm run dev
+```
+
+Acesse `http://localhost:3000` no navegador.
+
+## Comandos
+
+```bash
+npm run dev     # ambiente de desenvolvimento
+npm run lint    # análise estática
+npm run build   # exportação estática de produção
+```
 
 ## Estrutura
 
 ```text
-healthone-finance-transformation/
-├── docs/       # Documentação complementar
-├── specs/      # Especificações do projeto
-├── src/        # Código-fonte futuro
-├── .gitignore
-├── LICENSE
-└── README.md
+app/             # páginas, layout e estilos globais
+components/      # componentes compartilhados
+content/cases/   # conteúdo futuro dos Cases
+public/images/   # imagens públicas
+public/icons/    # ícones públicos
+docs/            # documentação complementar
+specs/           # especificações do projeto
 ```
+
+## Publicação
+
+O projeto está configurado com exportação estática para permitir publicação futura no GitHub Pages. A automação de deploy não faz parte desta SPEC.
 
 ## Licença
 
-Distribuído sob a licença MIT. Consulte `LICENSE` para mais informações.
+Este projeto está disponível sob a licença MIT.
