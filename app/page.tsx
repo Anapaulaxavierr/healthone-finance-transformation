@@ -4,7 +4,7 @@ import { Header } from "@/components/header";
 
 const cases = [
   { title: "Gestão Inteligente do Fluxo de Caixa", href: "/cases/gestao-inteligente-fluxo-caixa/" },
-  { title: "Correção Monetária utilizando IPCA" },
+  { title: "Correção Monetária utilizando IPCA", href: "/cases/correcao-monetaria-ipca/" },
   { title: "Automação de Contas a Pagar" },
 ];
 
