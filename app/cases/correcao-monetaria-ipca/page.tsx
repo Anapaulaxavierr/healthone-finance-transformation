@@ -45,6 +45,125 @@ const architecture = [
   },
 ];
 
+const challengeItems = [
+  {
+    title: "Escolha do período",
+    text: "A correção não começa simplesmente na data digitada. É preciso transformar datas em competências mensais e aplicar a regra a partir do mês seguinte ao fato gerador.",
+  },
+  {
+    title: "Fonte do índice",
+    text: "Copiar taxas manualmente aumenta o risco de usar um valor desatualizado, omitir um mês ou consultar uma fonte que não seja oficial.",
+  },
+  {
+    title: "Precisão do cálculo",
+    text: "Arredondar cada mês antes de concluir a composição altera o resultado. A precisão deve ser preservada durante toda a operação.",
+  },
+  {
+    title: "Rastreabilidade",
+    text: "Informar apenas o valor final não permite revisão. A solução precisa demonstrar quais índices entraram e como cada um afetou o saldo.",
+  },
+];
+
+const sheetTabs = [
+  {
+    tab: "Cálculo",
+    role: "Operação principal",
+    text: "Recebe o valor e as datas, inicia a automação e apresenta o resultado consolidado.",
+  },
+  {
+    tab: "Memória",
+    role: "Trilha de auditoria",
+    text: "Expõe mês a mês os índices oficiais, fatores compostos e evolução do valor.",
+  },
+  {
+    tab: "Simulação",
+    role: "Processamento em lote",
+    text: "Demonstra a mesma regra aplicada a cinco posições financeiras fictícias.",
+  },
+  {
+    tab: "Instruções",
+    role: "Apoio ao usuário",
+    text: "Explica o uso, a regra de cálculo, a fonte dos dados e os limites da solução.",
+  },
+];
+
+const calculationFields = [
+  ["Valor original", "Base monetária que será atualizada."],
+  ["Data inicial", "Data do fato gerador. O primeiro índice aplicado pertence ao mês seguinte."],
+  ["Data de referência", "Data até a qual o usuário deseja atualizar o valor."],
+  ["Status", "Informa se o cálculo foi integral, limitado pelo último índice oficial ou interrompido."],
+  ["Competência inicial", "Primeiro mês efetivamente incluído na composição do IPCA."],
+  ["Competência final efetiva", "Último mês usado, respeitando a disponibilidade oficial do Banco Central."],
+  ["Fator acumulado", "Produto matemático dos fatores mensais, mantido com precisão interna."],
+  ["Variação acumulada", "Percentual total correspondente ao fator composto do período."],
+  ["Valor corrigido", "Valor original multiplicado pelo fator acumulado e arredondado só na apresentação."],
+];
+
+const apiSteps = [
+  {
+    title: "O usuário executa o menu IPCA",
+    text: "O Apps Script adiciona um menu próprio ao abrir a planilha. A opção “Calcular correção” chama a função pública da automação.",
+    code: "onOpen() → calculateIpcaAdjustment()",
+  },
+  {
+    title: "O controlador protege a operação",
+    text: "Antes de calcular, o script cria um bloqueio do documento. Isso impede que duas execuções concorrentes sobrescrevam o mesmo resultado.",
+    code: "OperationController + LockService",
+  },
+  {
+    title: "A planilha entrega as três entradas",
+    text: "O gateway lê os intervalos nomeados, converte as datas da planilha e limpa somente a apresentação anterior.",
+    code: "SpreadsheetGateway",
+  },
+  {
+    title: "O domínio interpreta a regra financeira",
+    text: "O JavaScript valida valor e datas, transforma cada data em competência AAAA-MM e define o intervalo do mês seguinte à data inicial até o mês de referência.",
+    code: "Domain",
+  },
+  {
+    title: "O cliente consulta o Banco Central",
+    text: "Primeiro identifica a última competência publicada. Depois solicita à API SGS somente o intervalo necessário da série 433, o IPCA mensal oficial.",
+    code: "UrlFetchApp → api.bcb.gov.br → SGS 433",
+  },
+  {
+    title: "A resposta da API é validada",
+    text: "O JSON recebido é convertido em competências e percentuais. O script rejeita datas inválidas, duplicidades, lacunas e respostas incompletas.",
+    code: "SgsClient",
+  },
+  {
+    title: "Resultado e memória voltam à planilha",
+    text: "Os fatores são compostos sem arredondamento intermediário. O gateway escreve o resumo na aba Cálculo e toda a memória mensal na aba Memória.",
+    code: "Domain → SpreadsheetGateway",
+  },
+];
+
+const memoryColumns = [
+  ["Competência", "Mês do índice no formato AAAA-MM."],
+  ["IPCA mensal (%)", "Percentual oficial retornado pela série 433."],
+  ["Fator mensal", "Conversão da taxa: 1 + IPCA ÷ 100."],
+  ["Fator acumulado", "Produto do fator atual por todos os anteriores."],
+  ["Valor atualizado", "Evolução do valor original após cada competência."],
+];
+
+const simulationGroups = [
+  {
+    title: "Identificação",
+    text: "ID, tipo de título e emissor fictício permitem reconhecer cada posição sem usar dados reais.",
+  },
+  {
+    title: "Posição original",
+    text: "Quantidade e valor unitário formam o valor original que será corrigido.",
+  },
+  {
+    title: "Período",
+    text: "Datas civis são convertidas nas competências inicial e final efetivamente utilizadas.",
+  },
+  {
+    title: "Resultado",
+    text: "Fator, variação, valor corrigido e acréscimo tornam cada linha verificável.",
+  },
+];
+
 const proofPoints = [
   { value: "63/63", label: "verificações aprovadas" },
   { value: "39", label: "cenários automatizados" },
@@ -123,14 +242,49 @@ export default function IpcaCasePage() {
         </section>
 
         <section className="px-6 py-14 sm:py-16 lg:px-8">
-          <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
-            <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">O desafio</h2>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {["Competências incorretas", "Índices desatualizados", "Cálculo sem memória"].map((item) => (
-                <div key={item} className="rounded-xl border border-[#dbe4e3] bg-white p-5 text-sm font-semibold text-[#153a40]">
-                  <span aria-hidden="true" className="mb-4 block h-2 w-2 rounded-full bg-[#b56145]" />
-                  {item}
-                </div>
+          <div className="mx-auto max-w-6xl">
+            <div className="grid gap-8 lg:grid-cols-[0.65fr_1.35fr] lg:gap-20">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#267a67]">Por que este projeto existe</p>
+                <h2 className="mt-4 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">O desafio</h2>
+              </div>
+              <div className="space-y-4 text-base leading-7 text-[#4d686e]">
+                <p>
+                  Corrigir um valor pelo IPCA significa preservar seu poder de compra usando a inflação oficial acumulada entre duas datas. O processo parece simples, mas reúne decisões de período, fonte, precisão e auditoria.
+                </p>
+                <p>
+                  Em uma planilha manual, essas decisões ficam espalhadas entre células e consultas externas. O objetivo foi transformar esse trabalho em um fluxo único, repetível e verificável, sem exigir que o usuário conheça programação.
+                </p>
+              </div>
+            </div>
+            <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {challengeItems.map((item) => (
+                <article key={item.title} className="rounded-2xl border border-[#dbe4e3] bg-white p-6 shadow-[0_12px_36px_rgba(13,49,55,0.04)]">
+                  <span aria-hidden="true" className="mb-5 block h-2 w-2 rounded-full bg-[#b56145]" />
+                  <h3 className="text-base font-semibold text-[#153a40]">{item.title}</h3>
+                  <p className="mt-3 text-xs leading-5 text-[#587076]">{item.text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="border-y border-[#dbe4e3] bg-[#e8f0ee] px-6 py-16 sm:py-20 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeading eyebrow="Visão geral" title="Quatro abas. Um fluxo completo." />
+            <p className="mt-5 max-w-3xl text-sm leading-6 text-[#587076]">
+              O Google Sheets funciona como interface; o código JavaScript executado pelo Apps Script funciona como motor da solução. Cada aba possui uma responsabilidade clara.
+            </p>
+            <div className="mt-10 grid gap-4 md:grid-cols-2">
+              {sheetTabs.map((item, index) => (
+                <article key={item.tab} className="grid gap-4 rounded-2xl bg-white p-6 shadow-[0_12px_36px_rgba(13,49,55,0.05)] sm:grid-cols-[auto_1fr]">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0d3137] text-xs font-bold text-[#8de0c1]">0{index + 1}</span>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#267a67]">{item.role}</p>
+                    <h3 className="mt-2 text-xl font-semibold text-[#153a40]">Aba {item.tab}</h3>
+                    <p className="mt-3 text-sm leading-6 text-[#587076]">{item.text}</p>
+                  </div>
+                </article>
               ))}
             </div>
           </div>
@@ -159,10 +313,62 @@ export default function IpcaCasePage() {
                 ))}
               </ol>
             </div>
+
+            <div className="mt-14 border-t border-white/10 pt-12">
+              <div className="grid gap-5 lg:grid-cols-[0.7fr_1.3fr]">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#8de0c1]">Aba Cálculo</p>
+                  <h3 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-white">O que cada informação representa</h3>
+                </div>
+                <p className="max-w-2xl text-sm leading-6 text-[#c8d8d8]">
+                  A área amarela contém as únicas células preenchidas pelo usuário. Todo o bloco de conferência é produzido pelo script para reduzir digitação, padronizar a análise e deixar explícito o período realmente considerado.
+                </p>
+              </div>
+              <dl className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {calculationFields.map(([term, description]) => (
+                  <div key={term} className="rounded-xl border border-white/10 bg-white/[0.05] p-5">
+                    <dt className="text-sm font-semibold text-white">{term}</dt>
+                    <dd className="mt-2 text-xs leading-5 text-[#c8d8d8]">{description}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
           </div>
         </section>
 
-        <section id="construcao" className="scroll-mt-24 px-6 py-16 sm:py-20 lg:px-8">
+        <section className="px-6 py-16 sm:py-20 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeading eyebrow="Integração técnica" title="O que acontece depois do clique" />
+            <div className="mt-5 grid gap-4 text-sm leading-6 text-[#587076] lg:grid-cols-2">
+              <p>
+                Não existem fórmulas escondidas fazendo a consulta. A automação foi escrita em JavaScript no Google Apps Script, ambiente de programação integrado ao Google Sheets.
+              </p>
+              <p>
+                O Apps Script lê a planilha, conversa com a API pública do Banco Central, executa a regra financeira e devolve os resultados ao próprio arquivo.
+              </p>
+            </div>
+            <ol className="mt-10 grid gap-4">
+              {apiSteps.map((step, index) => (
+                <li key={step.title} className="grid gap-4 rounded-2xl border border-[#dbe4e3] bg-white p-6 shadow-[0_10px_30px_rgba(13,49,55,0.04)] sm:grid-cols-[3rem_1fr] lg:grid-cols-[3rem_0.8fr_1.2fr] lg:items-center">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#dcebe6] text-xs font-bold text-[#267a67]">0{index + 1}</span>
+                  <div>
+                    <h3 className="text-base font-semibold text-[#153a40]">{step.title}</h3>
+                    <code className="mt-2 block text-[0.7rem] font-bold text-[#267a67]">{step.code}</code>
+                  </div>
+                  <p className="text-sm leading-6 text-[#587076] sm:col-start-2 lg:col-start-auto">{step.text}</p>
+                </li>
+              ))}
+            </ol>
+            <div className="mt-8 rounded-2xl border border-[#bfd4cf] bg-[#e8f0ee] p-6 sm:p-8">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#267a67]">Em termos simples</p>
+              <p className="mt-4 max-w-4xl text-base leading-7 text-[#153a40]">
+                A planilha é a tela. O Apps Script é o motor. A API do Banco Central fornece os índices. O módulo financeiro transforma esses índices no fator acumulado. O gateway apresenta o resultado e registra a memória.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="construcao" className="scroll-mt-24 border-y border-[#e2e9e8] bg-white px-6 py-16 sm:py-20 lg:px-8">
           <div className="mx-auto max-w-6xl">
             <SectionHeading eyebrow="Como foi construída" title="Uma planilha com arquitetura de aplicação" />
             <p className="mt-5 max-w-2xl text-sm leading-6 text-[#587076]">
@@ -181,6 +387,18 @@ export default function IpcaCasePage() {
                 </li>
               ))}
             </ol>
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {[
+                ["Por que separar?", "Uma mudança visual na planilha não deve alterar a matemática, e uma mudança na API não deve exigir reconstruir a interface."],
+                ["Por que usar um gateway?", "Coordenadas de células, intervalos nomeados, formatos e escritas em lote ficam isolados do restante do código."],
+                ["Por que domínio puro?", "A regra financeira pode ser testada fora do Google Sheets, sem depender de planilha aberta, internet ou relógio."],
+              ].map(([title, text]) => (
+                <article key={title} className="rounded-xl bg-[#e8f0ee] p-6">
+                  <h3 className="text-sm font-semibold text-[#153a40]">{title}</h3>
+                  <p className="mt-3 text-xs leading-5 text-[#587076]">{text}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -201,6 +419,20 @@ export default function IpcaCasePage() {
                   valor corrigido = valor × fator
                 </code>
                 <p className="mt-6 text-sm leading-6 text-[#587076]">O arredondamento monetário acontece apenas na apresentação final.</p>
+              </div>
+            </div>
+            <div className="mt-10">
+              <h3 className="text-xl font-semibold tracking-[-0.02em] text-[#153a40]">Como ler as colunas da aba Memória</h3>
+              <dl className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                {memoryColumns.map(([term, description]) => (
+                  <div key={term} className="rounded-xl border border-[#dbe4e3] bg-[#f5f7f7] p-5">
+                    <dt className="text-sm font-semibold text-[#153a40]">{term}</dt>
+                    <dd className="mt-2 text-xs leading-5 text-[#587076]">{description}</dd>
+                  </div>
+                ))}
+              </dl>
+              <div className="mt-6 rounded-xl border-l-4 border-[#62a991] bg-[#e8f0ee] p-6 text-sm leading-6 text-[#4d686e]">
+                <strong className="text-[#153a40]">Exemplo de leitura:</strong> se o IPCA mensal é 0,86%, o fator daquele mês é 1,0086. Esse fator multiplica o saldo anterior; no mês seguinte, o novo fator é aplicado sobre o valor já atualizado. É uma composição, não uma soma simples de percentuais.
               </div>
             </div>
           </div>
@@ -228,6 +460,22 @@ export default function IpcaCasePage() {
                 </div>
               ))}
             </div>
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {simulationGroups.map((item) => (
+                <article key={item.title} className="rounded-xl border border-white/10 bg-white/[0.05] p-5">
+                  <h3 className="text-sm font-semibold text-white">{item.title}</h3>
+                  <p className="mt-3 text-xs leading-5 text-[#c8d8d8]">{item.text}</p>
+                </article>
+              ))}
+            </div>
+            <div className="mt-6 grid gap-4 border-t border-white/10 pt-6 md:grid-cols-2">
+              <p className="text-sm leading-6 text-[#c8d8d8]">
+                <strong className="text-white">Por que existe:</strong> a aba demonstra que a regra não foi criada apenas para um exemplo. O mesmo motor pode receber diferentes valores e datas sem duplicar a lógica em fórmulas por linha.
+              </p>
+              <p className="text-sm leading-6 text-[#c8d8d8]">
+                <strong className="text-white">Como o lote é otimizado:</strong> o controlador identifica o maior intervalo necessário, consulta os índices uma vez e reaproveita os registros para calcular cada posição.
+              </p>
+            </div>
             <p className="mt-4 text-xs text-[#9fb4b5]">Dados fictícios. Correção monetária não representa preço ou rentabilidade.</p>
           </div>
         </section>
@@ -235,6 +483,9 @@ export default function IpcaCasePage() {
         <section className="px-6 py-16 sm:py-20 lg:px-8">
           <div className="mx-auto max-w-6xl">
             <SectionHeading eyebrow="Adoção" title="A automação também ensina a usar" />
+            <p className="mt-5 max-w-3xl text-sm leading-6 text-[#587076]">
+              A aba Instruções reduz dependência de treinamento externo. Ela foi incluída para que uma nova pessoa compreenda a operação, a origem do índice e a lógica de cálculo antes de executar o primeiro processamento.
+            </p>
             <div className="mt-10 grid gap-6 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
               <EvidenceFigure
                 src="/images/cases/ipca/instrucoes-uso.png"
@@ -249,6 +500,43 @@ export default function IpcaCasePage() {
                   </div>
                 ))}
               </div>
+            </div>
+            <div className="mt-8 grid gap-3 md:grid-cols-3">
+              {[
+                ["Calcular correção", "Lê as entradas, consulta o IPCA, calcula e publica resumo e memória."],
+                ["Gerar simulação mockada", "Preenche o cenário fictício em lote para demonstrar reutilização da regra."],
+                ["Limpar dados", "Remove entradas e saídas operacionais com confirmação, sem apagar a estrutura da solução."],
+              ].map(([title, text]) => (
+                <article key={title} className="rounded-xl border border-[#dbe4e3] bg-white p-5">
+                  <code className="text-xs font-bold text-[#267a67]">IPCA › {title}</code>
+                  <p className="mt-3 text-xs leading-5 text-[#587076]">{text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="border-y border-[#e2e9e8] bg-white px-6 py-16 sm:py-20 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeading eyebrow="Decisões do projeto" title="Escolhas técnicas com justificativa de negócio" />
+            <div className="mt-10 grid gap-4 md:grid-cols-2">
+              {[
+                ["Por que Google Sheets?", "É uma ferramenta familiar para áreas financeiras. A interface reduz a barreira de adoção, enquanto o Apps Script adiciona automação sem exigir outro sistema."],
+                ["Por que a API do Banco Central?", "A integração elimina a transcrição manual e mantém a fonte rastreável. A série 433 representa o IPCA mensal oficial."],
+                ["Por que não usar apenas fórmulas?", "Validações, consulta externa, controle de concorrência, tratamento de falhas e geração de memória ficam mais consistentes em código modular."],
+                ["Por que limitar pela última competência?", "O IPCA é publicado após o mês de referência. Se o usuário pedir uma data futura, a automação usa somente o último índice oficial e avisa a limitação."],
+              ].map(([title, text]) => (
+                <article key={title} className="rounded-2xl border border-[#dbe4e3] bg-[#f5f7f7] p-6">
+                  <h3 className="text-base font-semibold text-[#153a40]">{title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-[#587076]">{text}</p>
+                </article>
+              ))}
+            </div>
+            <div className="mt-8 rounded-2xl bg-[#0d3137] p-7 sm:p-8">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#8de0c1]">Limite funcional</p>
+              <p className="mt-4 max-w-4xl text-sm leading-6 text-[#d8e6e4]">
+                A solução realiza correção monetária pelo IPCA. Ela não calcula juros, multas, impostos, rentabilidade, marcação a mercado ou risco de crédito. Separar esse limite evita apresentar a atualização inflacionária como retorno de investimento.
+              </p>
             </div>
           </div>
         </section>
