@@ -212,6 +212,99 @@ const menuCommands = [
   },
 ];
 
+const codeSamples = [
+  {
+    file: "Main.gs",
+    title: "Menu personalizado",
+    description: "Cria o menu IPCA sempre que a planilha é aberta e conecta cada item a uma função pública.",
+    code: `function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('IPCA')
+    .addItem('Calcular correção',
+      'calculateIpcaAdjustment')
+    .addItem('Gerar simulação mockada',
+      'generateMockIpcaSimulation')
+    .addItem('Limpar dados',
+      'clearIpcaWorkspace')
+    .addSeparator()
+    .addItem('Ver instruções',
+      'showIpcaInstructions')
+    .addToUi();
+}`,
+  },
+  {
+    file: "SgsClient.gs",
+    title: "Consulta à API oficial",
+    description: "Monta o período solicitado, chama o endpoint do Banco Central e encaminha o JSON para validação.",
+    code: `function sgsFetchRecords(initial, final) {
+  const initialDate =
+    sgsCompetenceToApiDate(initial, true);
+  const finalDate =
+    sgsCompetenceToApiDate(final, false);
+
+  const url = IPCA_CONFIG.sgsBaseUrl +
+    '?formato=json&dataInicial=' +
+    encodeURIComponent(initialDate) +
+    '&dataFinal=' +
+    encodeURIComponent(finalDate);
+
+  return sgsFetchAndNormalize(url,
+    initial + ':' + final);
+}`,
+  },
+  {
+    file: "Domain.gs",
+    title: "Composição financeira",
+    description: "Valida a sequência mensal e acumula os fatores sem arredondar os resultados intermediários.",
+    code: `let accumulatedFactor = 1;
+
+const memory = expected.map(function(
+  competence, index
+) {
+  const record = records[index];
+  const monthlyFactor =
+    1 + record.percentage / 100;
+
+  accumulatedFactor *= monthlyFactor;
+
+  return {
+    competence: competence,
+    percentage: record.percentage,
+    monthlyFactor: monthlyFactor,
+    accumulatedFactor: accumulatedFactor,
+    adjustedValue:
+      originalValue * accumulatedFactor
+  };
+});`,
+  },
+  {
+    file: "OperationController.gs",
+    title: "Controle da execução",
+    description: "Evita concorrência, coordena as camadas e garante a liberação do bloqueio mesmo quando ocorre uma falha.",
+    code: `function executeIpcaAdjustment() {
+  const lock = LockService.getDocumentLock();
+
+  if (!lock || !lock.tryLock(
+    IPCA_CONFIG.lockWaitMilliseconds
+  )) {
+    gatewayNotify(IPCA_MESSAGES.concurrent);
+    return;
+  }
+
+  try {
+    const input = gatewayReadInputs();
+    const validated = domainValidateInputs(input);
+    const latest = sgsFetchLatestRecord();
+    // consulta, cálculo e publicação
+  } catch (error) {
+    handleIpcaOperationError(error);
+  } finally {
+    lock.releaseLock();
+  }
+}`,
+  },
+];
+
 const proofPoints = [
   { value: "63/63", label: "verificações aprovadas" },
   { value: "39", label: "cenários automatizados" },
@@ -253,45 +346,74 @@ function EvidenceFigure({
   );
 }
 
+function CodeWindow({ sample }: { sample: (typeof codeSamples)[number] }) {
+  return (
+    <article className="overflow-hidden rounded-2xl border border-[#294b51] bg-[#0a252a] shadow-[0_18px_50px_rgba(13,49,55,0.12)]">
+      <div className="flex items-center justify-between border-b border-white/10 bg-[#12383e] px-5 py-3">
+        <div className="flex gap-1.5" aria-hidden="true">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#b56145]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#d4a84f]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#62a991]" />
+        </div>
+        <code className="text-[0.68rem] font-bold text-[#8de0c1]">{sample.file}</code>
+      </div>
+      <div className="p-6">
+        <h3 className="text-lg font-semibold text-white">{sample.title}</h3>
+        <p className="mt-2 text-xs leading-5 text-[#b8cccb]">{sample.description}</p>
+        <pre className="mt-5 overflow-x-auto rounded-xl bg-black/20 p-4 text-[0.7rem] leading-5 text-[#d8e6e4]"><code>{sample.code}</code></pre>
+      </div>
+    </article>
+  );
+}
+
 export default function IpcaCasePage() {
   return (
     <div className="min-h-screen bg-[#f5f7f7] text-[#102f35]">
       <Header />
       <main>
-        <section className="relative isolate overflow-hidden bg-[#0d3137] px-6 py-14 sm:py-16 lg:px-8">
+        <section className="relative isolate overflow-hidden bg-[#0d3137] px-6 py-10 sm:py-12 lg:px-8">
           <div aria-hidden="true" className="hero-grid absolute inset-0 -z-10 opacity-20" />
-          <div className="mx-auto max-w-6xl">
-            <span className="inline-flex rounded-full border border-[#8de0c1]/40 bg-[#8de0c1]/10 px-4 py-2 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[#8de0c1]">
-              Case 02 <span aria-hidden="true" className="mx-2 opacity-60">·</span> Spreadsheet Automation
-            </span>
-            <h1 className="mt-6 max-w-4xl text-4xl font-semibold leading-[1.06] tracking-[-0.04em] text-white sm:text-5xl lg:text-6xl">
-              Correção Monetária utilizando IPCA
-            </h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-[#c8d8d8] sm:text-lg">
-              Uma automação em planilha que consulta o Banco Central, aplica a regra financeira e explica cada centavo do resultado.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <a
-                href="#resumo-executivo"
-                className="rounded-full bg-[#8de0c1] px-5 py-3 text-sm font-bold text-[#0d3137] transition hover:bg-white"
-              >
-                Ver resumo executivo
-              </a>
-              <a
-                href="#dossie-tecnico"
-                className="rounded-full border border-white/20 px-5 py-3 text-sm font-bold text-white transition hover:border-white/50"
-              >
-                Explorar parte técnica
-              </a>
-              <a
-                href="https://docs.google.com/spreadsheets/d/1rwtRgUkiyb4zlMn7hd6YBxb9DJJ4N7I_m6aCC8cwn6k/copy"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center px-2 py-3 text-sm font-semibold text-[#8de0c1] transition hover:text-white"
-              >
-                Testar a planilha ↗
-              </a>
+          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
+            <div>
+              <span className="inline-flex rounded-full border border-[#8de0c1]/40 bg-[#8de0c1]/10 px-4 py-2 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[#8de0c1]">
+                Case 02 <span aria-hidden="true" className="mx-2 opacity-60">·</span> Correção Monetária utilizando IPCA
+              </span>
+              <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-[#8de0c1]">Destaque da solução</p>
+              <h1 className="mt-3 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.04em] text-white sm:text-5xl lg:text-[3.45rem]">
+                Um menu próprio dentro do Google Sheets
+              </h1>
+              <p className="mt-4 max-w-xl text-base leading-7 text-[#c8d8d8]">
+                O código JavaScript adiciona o menu IPCA ao cabeçalho da planilha e transforma toda a automação em quatro comandos simples para o usuário.
+              </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <a href="#resumo-executivo" className="rounded-full bg-[#8de0c1] px-5 py-3 text-sm font-bold text-[#0d3137] transition hover:bg-white">Ver o case</a>
+                <a href="#codigo-real" className="rounded-full border border-white/20 px-5 py-3 text-sm font-bold text-white transition hover:border-white/50">Ver código real</a>
+              </div>
             </div>
+            <figure className="overflow-hidden rounded-2xl border border-white/15 bg-white p-2 shadow-[0_24px_70px_rgba(0,0,0,0.22)]">
+              <img
+                src={`${basePath}/images/cases/ipca/menu-ipca-personalizado.png`}
+                alt="Menu personalizado IPCA aberto no cabeçalho do Google Sheets"
+                width="1280"
+                height="720"
+                className="w-full rounded-xl"
+              />
+              <figcaption className="px-3 py-3 text-[0.68rem] leading-5 text-[#587076]">
+                O menu é criado automaticamente pelo <code className="font-bold text-[#267a67]">onOpen()</code> do Apps Script.
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section className="border-b border-[#dbe4e3] bg-[#e8f0ee] px-6 py-8 lg:px-8">
+          <div className="mx-auto grid max-w-7xl gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {menuCommands.map((item, index) => (
+              <article key={item.command} className="rounded-xl bg-white p-5 shadow-[0_8px_24px_rgba(13,49,55,0.05)]">
+                <span className="text-xs font-bold text-[#267a67]">0{index + 1}</span>
+                <h2 className="mt-3 text-sm font-semibold text-[#153a40]">{item.command}</h2>
+                <p className="mt-2 text-xs leading-5 text-[#587076]">{item.text}</p>
+              </article>
+            ))}
           </div>
         </section>
 
@@ -353,55 +475,6 @@ export default function IpcaCasePage() {
                   </div>
                 </article>
               ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="px-6 py-16 sm:py-20 lg:px-8">
-          <div className="mx-auto max-w-6xl">
-            <div className="grid gap-6 lg:grid-cols-[0.7fr_1.3fr] lg:items-end">
-              <SectionHeading eyebrow="Destaque da solução" title="Um menu próprio dentro do Google Sheets" />
-              <div className="space-y-3 text-sm leading-6 text-[#587076]">
-                <p>
-                  Ao abrir o arquivo, o usuário encontra a opção <strong className="text-[#153a40]">IPCA</strong> ao lado dos menus nativos do Google Sheets. Ela transforma quatro rotinas do código em comandos claros e acessíveis.
-                </p>
-                <p>
-                  Isso elimina a necessidade de abrir o editor do Apps Script, executar funções manualmente ou conhecer a estrutura técnica da automação.
-                </p>
-              </div>
-            </div>
-            <div className="mt-10 overflow-hidden rounded-2xl border border-[#bfd4cf] bg-[#0d3137] p-2 shadow-[0_22px_60px_rgba(13,49,55,0.12)] sm:p-3">
-              <img
-                src={`${basePath}/images/cases/ipca/menu-ipca-personalizado.png`}
-                alt="Menu personalizado IPCA aberto no cabeçalho do Google Sheets, com quatro comandos da automação"
-                width="1280"
-                height="720"
-                className="w-full rounded-xl"
-              />
-              <div className="grid gap-3 p-3 pt-6 sm:grid-cols-2 sm:p-5 lg:grid-cols-4">
-                {menuCommands.map((item, index) => (
-                  <article key={item.command} className="rounded-xl border border-white/10 bg-white/[0.06] p-5">
-                    <span className="text-xs font-bold text-[#8de0c1]">0{index + 1}</span>
-                    <h3 className="mt-3 text-sm font-semibold text-white">{item.command}</h3>
-                    <p className="mt-2 text-xs leading-5 text-[#c8d8d8]">{item.text}</p>
-                    <code className="mt-4 block break-all text-[0.65rem] text-[#8de0c1]">{item.functionName}</code>
-                  </article>
-                ))}
-              </div>
-            </div>
-            <div className="mt-6 grid gap-4 rounded-2xl border border-[#dbe4e3] bg-white p-6 sm:p-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#267a67]">Como o botão aparece</p>
-                <h3 className="mt-3 text-xl font-semibold text-[#153a40]">Criado automaticamente pelo código</h3>
-              </div>
-              <div>
-                <code className="block overflow-x-auto rounded-xl bg-[#e8f0ee] p-4 text-xs leading-6 text-[#153a40]">
-                  onOpen() → SpreadsheetApp.getUi().createMenu(&apos;IPCA&apos;).addItem(...).addToUi()
-                </code>
-                <p className="mt-3 text-xs leading-5 text-[#587076]">
-                  A função <code className="font-bold text-[#267a67]">onOpen()</code> é executada pelo Google sempre que a planilha é aberta. Ela monta o menu e associa cada opção à função JavaScript correspondente.
-                </p>
-              </div>
             </div>
           </div>
         </section>
@@ -586,6 +659,27 @@ export default function IpcaCasePage() {
                 </article>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section id="codigo-real" className="scroll-mt-24 bg-[#0d3137] px-6 py-16 sm:py-20 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeading eyebrow="Código real do projeto" title="JavaScript por trás da planilha" light />
+            <p className="mt-5 max-w-3xl text-sm leading-6 text-[#c8d8d8]">
+              Os trechos abaixo pertencem aos arquivos do Apps Script e mostram como interface, integração, domínio financeiro e controle operacional foram implementados em módulos separados.
+            </p>
+            <div className="mt-10 grid gap-5 lg:grid-cols-2">
+              {codeSamples.map((sample) => <CodeWindow key={sample.file} sample={sample} />)}
+            </div>
+            <aside className="mt-10 grid gap-5 rounded-2xl border border-[#8de0c1]/25 bg-[#8de0c1]/10 p-7 sm:p-8 lg:grid-cols-[0.55fr_1.45fr] lg:items-center">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#8de0c1]">Metodologia de desenvolvimento</p>
+                <h3 className="mt-3 text-xl font-semibold text-white">IA com direção e validação humana</h3>
+              </div>
+              <p className="text-sm leading-6 text-[#d8e6e4]">
+                Agentes de IA apoiaram as etapas que envolviam código, revisão e documentação. O trabalho seguiu <strong className="text-white">Spec-Driven Development (SDD)</strong>: cada evolução começou por uma especificação com escopo e critérios de aceite, foi implementada, testada e validada antes da etapa seguinte. Ana definiu as regras financeiras, conduziu as decisões e revisou as entregas.
+              </p>
+            </aside>
           </div>
         </section>
 
