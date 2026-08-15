@@ -164,6 +164,31 @@ const simulationGroups = [
   },
 ];
 
+const executiveValue = [
+  {
+    title: "Confiabilidade",
+    text: "Índices oficiais consultados diretamente na fonte, sem transcrição manual.",
+  },
+  {
+    title: "Produtividade",
+    text: "Três entradas e um comando substituem pesquisa, composição e conferência manuais.",
+  },
+  {
+    title: "Auditabilidade",
+    text: "Cada taxa, fator e valor intermediário permanece disponível para revisão.",
+  },
+  {
+    title: "Escalabilidade",
+    text: "A mesma regra financeira pode processar várias posições sem duplicar fórmulas.",
+  },
+];
+
+const contribution = [
+  ["Diagnóstico", "Tradução dos riscos do processo manual em requisitos de negócio e controles."],
+  ["Construção", "Modelagem da regra financeira, integração com a API e desenvolvimento em Apps Script."],
+  ["Entrega", "Interface orientada ao usuário, memória auditável, simulação e bateria de validações."],
+];
+
 const proofPoints = [
   { value: "63/63", label: "verificações aprovadas" },
   { value: "39", label: "cenários automatizados" },
@@ -224,24 +249,43 @@ export default function IpcaCasePage() {
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <a
+                href="#resumo-executivo"
+                className="rounded-full bg-[#8de0c1] px-5 py-3 text-sm font-bold text-[#0d3137] transition hover:bg-white"
+              >
+                Ver resumo executivo
+              </a>
+              <a
+                href="#dossie-tecnico"
+                className="rounded-full border border-white/20 px-5 py-3 text-sm font-bold text-white transition hover:border-white/50"
+              >
+                Explorar parte técnica
+              </a>
+              <a
                 href="https://docs.google.com/spreadsheets/d/1rwtRgUkiyb4zlMn7hd6YBxb9DJJ4N7I_m6aCC8cwn6k/copy"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full bg-[#8de0c1] px-5 py-3 text-sm font-bold text-[#0d3137] transition hover:bg-white"
+                className="inline-flex items-center px-2 py-3 text-sm font-semibold text-[#8de0c1] transition hover:text-white"
               >
-                Testar uma cópia
-              </a>
-              <a
-                href="#construcao"
-                className="rounded-full border border-white/20 px-5 py-3 text-sm font-bold text-white transition hover:border-white/50"
-              >
-                Ver como foi construída
+                Testar a planilha ↗
               </a>
             </div>
           </div>
         </section>
 
-        <section className="px-6 py-14 sm:py-16 lg:px-8">
+        <section className="border-b border-[#dbe4e3] bg-white px-6 py-6 lg:px-8">
+          <div className="mx-auto grid max-w-6xl gap-3 sm:grid-cols-2">
+            <a href="#resumo-executivo" className="group flex items-center justify-between rounded-xl border border-[#dbe4e3] px-5 py-4 transition hover:border-[#62a991]">
+              <span><strong className="block text-sm text-[#153a40]">Leitura executiva</strong><span className="mt-1 block text-xs text-[#587076]">Problema, solução, valor e competências.</span></span>
+              <span className="text-[#62a991] transition group-hover:translate-x-1">→</span>
+            </a>
+            <a href="#dossie-tecnico" className="group flex items-center justify-between rounded-xl border border-[#dbe4e3] px-5 py-4 transition hover:border-[#62a991]">
+              <span><strong className="block text-sm text-[#153a40]">Dossiê técnico</strong><span className="mt-1 block text-xs text-[#587076]">Abas, JavaScript, API, arquitetura e testes.</span></span>
+              <span className="text-[#62a991] transition group-hover:translate-x-1">→</span>
+            </a>
+          </div>
+        </section>
+
+        <section id="resumo-executivo" className="scroll-mt-24 px-6 py-14 sm:py-16 lg:px-8">
           <div className="mx-auto max-w-6xl">
             <div className="grid gap-8 lg:grid-cols-[0.65fr_1.35fr] lg:gap-20">
               <div>
@@ -314,7 +358,56 @@ export default function IpcaCasePage() {
               </ol>
             </div>
 
-            <div className="mt-14 border-t border-white/10 pt-12">
+          </div>
+        </section>
+
+        <section className="px-6 py-16 sm:py-20 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeading eyebrow="Valor entregue" title="O que a solução muda na prática" />
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {executiveValue.map((item) => (
+                <article key={item.title} className="rounded-2xl border border-[#dbe4e3] bg-white p-6 shadow-[0_12px_36px_rgba(13,49,55,0.04)]">
+                  <span aria-hidden="true" className="mb-5 block h-1 w-10 rounded-full bg-[#62a991]" />
+                  <h3 className="text-lg font-semibold text-[#153a40]">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-[#587076]">{item.text}</p>
+                </article>
+              ))}
+            </div>
+            <div className="mt-14 grid gap-8 lg:grid-cols-[0.55fr_1.45fr] lg:gap-16">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#267a67]">Minha atuação</p>
+                <h3 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-[#153a40]">Da regra à entrega</h3>
+              </div>
+              <div className="grid gap-3 md:grid-cols-3">
+                {contribution.map(([title, text], index) => (
+                  <article key={title} className="rounded-xl bg-[#e8f0ee] p-5">
+                    <span className="text-xs font-bold text-[#267a67]">0{index + 1}</span>
+                    <h4 className="mt-4 text-base font-semibold text-[#153a40]">{title}</h4>
+                    <p className="mt-2 text-xs leading-5 text-[#587076]">{text}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+            <div className="mt-10 flex flex-wrap gap-2">
+              {skills.slice(0, 6).map((skill) => (
+                <span key={skill} className="rounded-full border border-[#bfd4cf] bg-white px-4 py-2 text-xs font-bold text-[#21474d]">{skill}</span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="dossie-tecnico" className="scroll-mt-24 bg-[#0d3137] px-6 py-16 sm:py-20 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <div className="grid gap-6 border-b border-white/10 pb-12 lg:grid-cols-[0.7fr_1.3fr]">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#8de0c1]">Dossiê técnico</p>
+                <h2 className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-white sm:text-4xl">Por dentro da automação</h2>
+              </div>
+              <p className="max-w-2xl text-base leading-7 text-[#c8d8d8]">
+                A partir daqui, o Case detalha a estrutura da planilha, o código JavaScript, a comunicação com o Banco Central, a matemática financeira e as decisões de engenharia.
+              </p>
+            </div>
+            <div className="pt-12">
               <div className="grid gap-5 lg:grid-cols-[0.7fr_1.3fr]">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#8de0c1]">Aba Cálculo</p>
@@ -359,6 +452,28 @@ export default function IpcaCasePage() {
                 </li>
               ))}
             </ol>
+            <div className="mt-10 grid gap-4 lg:grid-cols-2">
+              <article className="overflow-hidden rounded-2xl bg-[#102f35] p-6 sm:p-7">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#8de0c1]">Requisição ao SGS</p>
+                <p className="mt-4 text-sm leading-6 text-[#c8d8d8]">
+                  A execução individual faz uma chamada para descobrir o índice mais recente e outra para buscar somente o período necessário.
+                </p>
+                <code className="mt-6 block overflow-x-auto rounded-xl bg-black/20 p-4 text-[0.7rem] leading-6 text-[#d8e6e4]">
+                  GET api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&amp;dataInicial=01/02/2024&amp;dataFinal=31/03/2024
+                </code>
+              </article>
+              <article className="overflow-hidden rounded-2xl bg-[#102f35] p-6 sm:p-7">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#8de0c1]">Núcleo do cálculo</p>
+                <p className="mt-4 text-sm leading-6 text-[#c8d8d8]">
+                  Depois de validar a sequência retornada, o domínio converte cada percentual em fator e mantém a precisão acumulada.
+                </p>
+                <code className="mt-6 block overflow-x-auto rounded-xl bg-black/20 p-4 text-[0.7rem] leading-6 text-[#d8e6e4]">
+                  monthlyFactor = 1 + percentage / 100;<br />
+                  accumulatedFactor *= monthlyFactor;<br />
+                  adjustedValue = originalValue * accumulatedFactor;
+                </code>
+              </article>
+            </div>
             <div className="mt-8 rounded-2xl border border-[#bfd4cf] bg-[#e8f0ee] p-6 sm:p-8">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#267a67]">Em termos simples</p>
               <p className="mt-4 max-w-4xl text-base leading-7 text-[#153a40]">
