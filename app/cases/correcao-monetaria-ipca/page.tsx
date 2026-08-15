@@ -189,6 +189,29 @@ const contribution = [
   ["Entrega", "Interface orientada ao usuário, memória auditável, simulação e bateria de validações."],
 ];
 
+const menuCommands = [
+  {
+    command: "Calcular correção",
+    functionName: "calculateIpcaAdjustment()",
+    text: "Lê as entradas, consulta o IPCA, calcula o valor e publica resumo e memória.",
+  },
+  {
+    command: "Gerar simulação mockada",
+    functionName: "generateMockIpcaSimulation()",
+    text: "Processa o cenário fictício em lote para demonstrar a reutilização da regra.",
+  },
+  {
+    command: "Limpar dados",
+    functionName: "clearIpcaWorkspace()",
+    text: "Remove entradas e saídas operacionais com confirmação, preservando a estrutura.",
+  },
+  {
+    command: "Ver instruções",
+    functionName: "showIpcaInstructions()",
+    text: "Leva o usuário à orientação de uso e às premissas financeiras da solução.",
+  },
+];
+
 const proofPoints = [
   { value: "63/63", label: "verificações aprovadas" },
   { value: "39", label: "cenários automatizados" },
@@ -330,6 +353,55 @@ export default function IpcaCasePage() {
                   </div>
                 </article>
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="px-6 py-16 sm:py-20 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <div className="grid gap-6 lg:grid-cols-[0.7fr_1.3fr] lg:items-end">
+              <SectionHeading eyebrow="Destaque da solução" title="Um menu próprio dentro do Google Sheets" />
+              <div className="space-y-3 text-sm leading-6 text-[#587076]">
+                <p>
+                  Ao abrir o arquivo, o usuário encontra a opção <strong className="text-[#153a40]">IPCA</strong> ao lado dos menus nativos do Google Sheets. Ela transforma quatro rotinas do código em comandos claros e acessíveis.
+                </p>
+                <p>
+                  Isso elimina a necessidade de abrir o editor do Apps Script, executar funções manualmente ou conhecer a estrutura técnica da automação.
+                </p>
+              </div>
+            </div>
+            <div className="mt-10 overflow-hidden rounded-2xl border border-[#bfd4cf] bg-[#0d3137] p-2 shadow-[0_22px_60px_rgba(13,49,55,0.12)] sm:p-3">
+              <img
+                src={`${basePath}/images/cases/ipca/menu-ipca-personalizado.png`}
+                alt="Menu personalizado IPCA aberto no cabeçalho do Google Sheets, com quatro comandos da automação"
+                width="1280"
+                height="720"
+                className="w-full rounded-xl"
+              />
+              <div className="grid gap-3 p-3 pt-6 sm:grid-cols-2 sm:p-5 lg:grid-cols-4">
+                {menuCommands.map((item, index) => (
+                  <article key={item.command} className="rounded-xl border border-white/10 bg-white/[0.06] p-5">
+                    <span className="text-xs font-bold text-[#8de0c1]">0{index + 1}</span>
+                    <h3 className="mt-3 text-sm font-semibold text-white">{item.command}</h3>
+                    <p className="mt-2 text-xs leading-5 text-[#c8d8d8]">{item.text}</p>
+                    <code className="mt-4 block break-all text-[0.65rem] text-[#8de0c1]">{item.functionName}</code>
+                  </article>
+                ))}
+              </div>
+            </div>
+            <div className="mt-6 grid gap-4 rounded-2xl border border-[#dbe4e3] bg-white p-6 sm:p-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#267a67]">Como o botão aparece</p>
+                <h3 className="mt-3 text-xl font-semibold text-[#153a40]">Criado automaticamente pelo código</h3>
+              </div>
+              <div>
+                <code className="block overflow-x-auto rounded-xl bg-[#e8f0ee] p-4 text-xs leading-6 text-[#153a40]">
+                  onOpen() → SpreadsheetApp.getUi().createMenu(&apos;IPCA&apos;).addItem(...).addToUi()
+                </code>
+                <p className="mt-3 text-xs leading-5 text-[#587076]">
+                  A função <code className="font-bold text-[#267a67]">onOpen()</code> é executada pelo Google sempre que a planilha é aberta. Ela monta o menu e associa cada opção à função JavaScript correspondente.
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -616,15 +688,11 @@ export default function IpcaCasePage() {
                 ))}
               </div>
             </div>
-            <div className="mt-8 grid gap-3 md:grid-cols-3">
-              {[
-                ["Calcular correção", "Lê as entradas, consulta o IPCA, calcula e publica resumo e memória."],
-                ["Gerar simulação mockada", "Preenche o cenário fictício em lote para demonstrar reutilização da regra."],
-                ["Limpar dados", "Remove entradas e saídas operacionais com confirmação, sem apagar a estrutura da solução."],
-              ].map(([title, text]) => (
-                <article key={title} className="rounded-xl border border-[#dbe4e3] bg-white p-5">
-                  <code className="text-xs font-bold text-[#267a67]">IPCA › {title}</code>
-                  <p className="mt-3 text-xs leading-5 text-[#587076]">{text}</p>
+            <div className="mt-8 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+              {menuCommands.map((item) => (
+                <article key={item.command} className="rounded-xl border border-[#dbe4e3] bg-white p-5">
+                  <code className="text-xs font-bold text-[#267a67]">IPCA › {item.command}</code>
+                  <p className="mt-3 text-xs leading-5 text-[#587076]">{item.text}</p>
                 </article>
               ))}
             </div>
