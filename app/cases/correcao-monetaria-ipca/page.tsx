@@ -388,6 +388,14 @@ export default function IpcaCasePage() {
               <div className="mt-7 flex flex-wrap gap-3">
                 <a href="#resumo-executivo" className="rounded-full bg-[#8de0c1] px-5 py-3 text-sm font-bold text-[#0d3137] transition hover:bg-white">Ver o case</a>
                 <a href="#codigo-real" className="rounded-full border border-white/20 px-5 py-3 text-sm font-bold text-white transition hover:border-white/50">Ver código real</a>
+                <a
+                  href="https://docs.google.com/spreadsheets/d/1rwtRgUkiyb4zlMn7hd6YBxb9DJJ4N7I_m6aCC8cwn6k/copy"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full border border-[#8de0c1]/40 bg-[#8de0c1]/10 px-5 py-3 text-sm font-bold text-[#8de0c1] transition hover:bg-[#8de0c1] hover:text-[#0d3137]"
+                >
+                  Criar uma cópia ↗
+                </a>
               </div>
             </div>
             <figure className="overflow-hidden rounded-2xl border border-white/15 bg-white p-2 shadow-[0_24px_70px_rgba(0,0,0,0.22)]">
@@ -677,7 +685,7 @@ export default function IpcaCasePage() {
                 <h3 className="mt-3 text-xl font-semibold text-white">IA com direção e validação humana</h3>
               </div>
               <p className="text-sm leading-6 text-[#d8e6e4]">
-                Agentes de IA apoiaram as etapas que envolviam código, revisão e documentação. O trabalho seguiu <strong className="text-white">Spec-Driven Development (SDD)</strong>: cada evolução começou por uma especificação com escopo e critérios de aceite, foi implementada, testada e validada antes da etapa seguinte. Ana definiu as regras financeiras, conduziu as decisões e revisou as entregas.
+                Agentes de IA apoiaram as etapas que envolviam código, revisão e documentação. O trabalho seguiu <strong className="text-white">Spec-Driven Development (SDD)</strong>: cada evolução começou por uma especificação com escopo e critérios de aceite, foi implementada, testada e validada antes da etapa seguinte.
               </p>
             </aside>
           </div>
